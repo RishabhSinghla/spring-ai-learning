@@ -3,13 +3,25 @@ package com.spring.ai.firstproject.service;
 import com.spring.ai.firstproject.entity.Tut;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 public class ChatServiceImpl implements ChatService {
 
     private ChatClient chatClient;
+
+    @Value("classpath:/prompts/user-message.st")
+    private Resource userMessage;
+
+    @Value("classpath:/prompts/system-message.st")
+    private Resource systemMessage;
 
     @Autowired
     public ChatServiceImpl(ChatClient chatClient){
@@ -63,5 +75,50 @@ public class ChatServiceImpl implements ChatService {
                 .content();
 
         return content;
+    }
+
+    public String chatTemplate(){
+
+        // 1st way
+//        // first step
+//        PromptTemplate strTemplate = PromptTemplate.builder().template("What is {techName}? tell me also about {exampleName}").build();
+//
+//        // render the template
+//        String renderedMessage = strTemplate.render(Map.of("techName", "java", "exampleName", "spring exception"));
+//
+//        Prompt prompt = new Prompt(renderedMessage);
+
+        // 2nd way
+//        var systemPromptTemplate = SystemPromptTemplate.builder()
+//                .template("You are a helpful coding assistant.")
+//                .build();
+//
+//        var systemMessage = systemPromptTemplate.createMessage();
+//
+//        var userPromptTemplate = PromptTemplate.builder().template("What is {techName}? Tell me all about {techExample}").build();
+//
+//        var userMessage = userPromptTemplate.createMessage(Map.of(
+//                "techName", "java",
+//                "techExample", "spring exception"
+//        ));
+//
+//        Prompt prompt = new Prompt(systemMessage, userMessage);
+//        return this.chatClient.prompt(prompt).call().content();
+
+        // 3rd way Fluent API
+//        return this.chatClient
+//                .prompt()
+//                .system(system -> system.text("You are a helpful coding assistant"))
+//                .user(user -> user.text("What is {techName}? Tell me all about {techExample}").param("techName", "java").param("techExample", "spring exception"))
+//                .call()
+//                .content();
+
+        //4th Way from resource
+        return this.chatClient
+                .prompt()
+                .system(system -> system.text(this.systemMessage))
+                .user(user -> user.text(this.userMessage).param("concept", "java"))
+                .call()
+                .content();
     }
 }
