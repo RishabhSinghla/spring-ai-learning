@@ -114,6 +114,14 @@ public class ChatServiceImpl implements ChatService {
 //                .content();
 
         //4th Way from resource
+//        return this.chatClient
+//                .prompt()
+//                .system(system -> system.text(this.systemMessage))
+//                .user(user -> user.text(this.userMessage).param("concept", "java"))
+//                .call()
+//                .content();
+
+        // Advisors in Spring AI, request intercepted before going to LLM
         return this.chatClient
                 .prompt()
                 .system(system -> system.text(this.systemMessage))
